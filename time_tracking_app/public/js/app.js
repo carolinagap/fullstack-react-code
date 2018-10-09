@@ -1,46 +1,51 @@
 /* eslint-disable react/prefer-stateless-function */
-/* eslint-disable no-undef */
-const TimersDashboard = React.createClass({
-  getInitialState: function () {
-    return {
-  // leanpub-start-insert
-      timers: [],
-    };
-  },
-  componentDidMount: function () {
-    this.loadTimersFromServer();
-    setInterval(this.loadTimersFromServer, 5000);
-  },
-  loadTimersFromServer: function () {
-    client.getTimers((serverTimers) => (
-        this.setState({ timers: serverTimers })
-      )
-    );
-  },
-  // leanpub-end-insert
-  // ...
-  handleCreateFormSubmit: function (timer) {
+/* eslint-disable react/jsx-boolean-value */
+class TimersDashboard extends React.Component {
+  state = {
+    timers: [
+      {
+        title: 'Practice squat',
+        project: 'Gym Chores',
+        id: uuid.v4(),
+        elapsed: 5456099,
+        runningSince: Date.now(),
+      },
+      {
+        title: 'Bake squash',
+        project: 'Kitchen Chores',
+        id: uuid.v4(),
+        elapsed: 1273998,
+        runningSince: null,
+      },
+    ]
+  };
+
+  handleCreateFormSubmit = (timer) => {
     this.createTimer(timer);
-  },
-  handleEditFormSubmit: function (attrs) {
+  };
+
+  handleEditFormSubmit = (attrs) => {
     this.updateTimer(attrs);
-  },
-  handleTrashClick: function (timerId) {
+  };
+
+  handleTrashClick = (timerId) => {
     this.deleteTimer(timerId);
-  },
-  handleStartClick: function (timerId) {
-    this.startTimer(timerId);
-  },
-  handleStopClick: function (timerId) {
-    this.stopTimer(timerId);
-  },
-  createTimer: function (timer) {
+  };
+
+  createTimer = (timer) => {
     const t = helpers.newTimer(timer);
     this.setState({
       timers: this.state.timers.concat(t),
     });
-  },
-  updateTimer: function (attrs) {
+  };
+
+  deleteTimer = (timerId) => {
+    this.setState({
+      timers: this.state.timers.filter(t => t.id !== timerId),
+    });
+  };
+
+  updateTimer = (attrs) => {
     this.setState({
       timers: this.state.timers.map((timer) => {
         if (timer.id === attrs.id) {
@@ -53,45 +58,9 @@ const TimersDashboard = React.createClass({
         }
       }),
     });
-  },
-  deleteTimer: function (timerId) {
-    this.setState({
-      timers: this.state.timers.filter(t => t.id !== timerId),
-    });
-  },
-  startTimer: function (timerId) {
-    const now = Date.now();
+  };
 
-    this.setState({
-      timers: this.state.timers.map((timer) => {
-        if (timer.id === timerId) {
-          return Object.assign({}, timer, {
-            runningSince: now,
-          });
-        } else {
-          return timer;
-        }
-      }),
-    });
-  },
-  stopTimer: function (timerId) {
-    const now = Date.now();
-
-    this.setState({
-      timers: this.state.timers.map((timer) => {
-        if (timer.id === timerId) {
-          const lastElapsed = now - timer.runningSince;
-          return Object.assign({}, timer, {
-            elapsed: timer.elapsed + lastElapsed,
-            runningSince: null,
-          });
-        } else {
-          return timer;
-        }
-      }),
-    });
-  },
-  render: function () {
+  render() {
     return (
       <div className='ui three column centered grid'>
         <div className='column'>
@@ -99,8 +68,6 @@ const TimersDashboard = React.createClass({
             timers={this.state.timers}
             onFormSubmit={this.handleEditFormSubmit}
             onTrashClick={this.handleTrashClick}
-            onStartClick={this.handleStartClick}
-            onStopClick={this.handleStopClick}
           />
           <ToggleableTimerForm
             onFormSubmit={this.handleCreateFormSubmit}
@@ -108,26 +75,28 @@ const TimersDashboard = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+};
 
-const ToggleableTimerForm = React.createClass({
-  getInitialState: function () {
-    return {
-      isOpen: false,
-    };
-  },
-  handleFormOpen: function () {
+class ToggleableTimerForm extends React.Component {
+  state = {
+    isOpen: false,
+  };
+
+  handleFormOpen = () => {
     this.setState({ isOpen: true });
-  },
-  handleFormClose: function () {
+  };
+
+  handleFormClose = () => {
     this.setState({ isOpen: false });
-  },
-  handleFormSubmit: function (timer) {
+  };
+
+  handleFormSubmit = (timer) => {
     this.props.onFormSubmit(timer);
     this.setState({ isOpen: false });
-  },
-  render: function () {
+  };
+
+  render() {
     if (this.state.isOpen) {
       return (
         <TimerForm
@@ -147,11 +116,11 @@ const ToggleableTimerForm = React.createClass({
         </div>
       );
     }
-  },
-});
+  }
+};
 
-const EditableTimerList = React.createClass({
-  render: function () {
+class EditableTimerList extends React.Component {
+  render() {
     const timers = this.props.timers.map((timer) => (
       <EditableTimer
         key={timer.id}
@@ -162,41 +131,44 @@ const EditableTimerList = React.createClass({
         runningSince={timer.runningSince}
         onFormSubmit={this.props.onFormSubmit}
         onTrashClick={this.props.onTrashClick}
-        onStartClick={this.props.onStartClick}
-        onStopClick={this.props.onStopClick}
       />
     ));
+
     return (
       <div id='timers'>
         {timers}
       </div>
     );
-  },
-});
+  }
+};
 
-const EditableTimer = React.createClass({
-  getInitialState: function () {
-    return {
-      editFormOpen: false,
-    };
-  },
-  handleEditClick: function () {
+class EditableTimer extends React.Component {
+  state = {
+    editFormOpen: false,
+  };
+
+  handleEditClick = () => {
     this.openForm();
-  },
-  handleFormClose: function () {
+  };
+
+  handleFormClose = () => {
     this.closeForm();
-  },
-  handleSubmit: function (timer) {
+  };
+
+  handleSubmit = (timer) => {
     this.props.onFormSubmit(timer);
     this.closeForm();
-  },
-  closeForm: function () {
+  };
+
+  closeForm = () => {
     this.setState({ editFormOpen: false });
-  },
-  openForm: function () {
-    this.setState({ editFormOpen: true });
-  },
-  render: function () {
+  };
+
+  openForm = () => {
+   this.setState({ editFormOpen: true });
+  };
+
+  render() {
     if (this.state.editFormOpen) {
       return (
         <TimerForm
@@ -217,34 +189,19 @@ const EditableTimer = React.createClass({
           runningSince={this.props.runningSince}
           onEditClick={this.handleEditClick}
           onTrashClick={this.props.onTrashClick}
-          onStartClick={this.props.onStartClick}
-          onStopClick={this.props.onStopClick}
         />
       );
     }
-  },
-});
+  }
+};
 
-const Timer = React.createClass({
-  componentDidMount: function () {
-    this.forceUpdateInterval = setInterval(() => this.forceUpdate(), 50);
-  },
-  componentWillUnmount: function () {
-    clearInterval(this.forceUpdateInterval);
-  },
-  handleStartClick: function () {
-    this.props.onStartClick(this.props.id);
-  },
-  handleStopClick: function () {
-    this.props.onStopClick(this.props.id);
-  },
-  handleTrashClick: function () {
+class Timer extends React.Component {
+  handleTrashClick = () => {
     this.props.onTrashClick(this.props.id);
-  },
-  render: function () {
-    const elapsedString = helpers.renderElapsedString(
-      this.props.elapsed, this.props.runningSince
-    );
+  };
+
+  render() {
+    const elapsedString = helpers.renderElapsedString(this.props.elapsed);
     return (
       <div className='ui centered card'>
         <div className='content'>
@@ -274,64 +231,55 @@ const Timer = React.createClass({
             </span>
           </div>
         </div>
-        <TimerActionButton
-          timerIsRunning={!!this.props.runningSince}
-          onStartClick={this.handleStartClick}
-          onStopClick={this.handleStopClick}
-        />
-      </div>
-    );
-  },
-});
-
-const TimerActionButton = React.createClass({
-  render: function () {
-    if (this.props.timerIsRunning) {
-      return (
-        <div
-          className='ui bottom attached red basic button'
-          onClick={this.props.onStopClick}
-        >
-          Stop
-        </div>
-      );
-    } else {
-      return (
-        <div
-          className='ui bottom attached green basic button'
-          onClick={this.props.onStartClick}
-        >
+        <div className='ui bottom attached blue basic button'>
           Start
         </div>
-      );
-    }
-  },
-});
+      </div>
+    );
+  }
+};
 
-const TimerForm = React.createClass({
-  handleSubmit: function () {
+class TimerForm extends React.Component {
+  state = {
+    title: this.props.title || '',
+    project: this.props.project || '',
+  };
+
+  handleTitleChange = (e) => {
+    this.setState({ title: e.target.value });
+  };
+
+  handleProjectChange = (e) => {
+    this.setState({ project: e.target.value });
+  };
+
+  handleSubmit = () => {
     this.props.onFormSubmit({
       id: this.props.id,
-      title: this.refs.title.value,
-      project: this.refs.project.value,
+      title: this.state.title,
+      project: this.state.project,
     });
-  },
-  render: function () {
+  };
+
+  render() {
     const submitText = this.props.id ? 'Update' : 'Create';
+
     return (
       <div className='ui centered card'>
         <div className='content'>
           <div className='ui form'>
             <div className='field'>
               <label>Title</label>
-              <input type='text' ref='title'
-                defaultValue={this.props.title}
+              <input type='text'
+                defaultValue={this.state.title}
+                onChange={this.handleTitleChange}
               />
             </div>
             <div className='field'>
               <label>Project</label>
-              <input type='text' ref='project'
-                defaultValue={this.props.project}
+              <input type='text'
+                defaultValue={this.state.project}
+                onChange={this.handleProjectChange}
               />
             </div>
             <div className='ui two bottom attached buttons'>
@@ -352,8 +300,8 @@ const TimerForm = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+};
 
 ReactDOM.render(
   <TimersDashboard />,

@@ -1,118 +1,66 @@
 /* eslint-disable react/prefer-stateless-function */
-/* eslint-disable no-undef */
-const TimersDashboard = React.createClass({
-  // leanpub-start-insert
-  getInitialState: function () {
-    return {
-      timers: [
-        {
-          title: 'Practice squat',
-          project: 'Gym Chores',
-          id: uuid.v4(),
-          elapsed: 5456099,
-          runningSince: Date.now(),
-        },
-        {
-          title: 'Bake squash',
-          project: 'Kitchen Chores',
-          id: uuid.v4(),
-          elapsed: 1273998,
-          runningSince: null,
-        },
-      ],
-    };
-  },
-  // leanpub-end-insert
-  render: function () {
+/* eslint-disable react/jsx-boolean-value */
+class TimersDashboard extends React.Component {
+  render() {
     return (
       <div className='ui three column centered grid'>
         <div className='column'>
-          {/* leanpub-start-insert */}
-          <EditableTimerList
-            timers={this.state.timers}
+          <EditableTimerList />
+          <ToggleableTimerForm
+            isOpen={true}
           />
-          {/* leanpub-end-insert */}
-          <ToggleableTimerForm />
         </div>
       </div>
     );
-  },
-});
+  }
+};
 
-const ToggleableTimerForm = React.createClass({
-  // leanpub-start-insert
-  getInitialState: function () {
-    return {
-      isOpen: false,
-    };
-  },
-  handleFormOpen: function () {
-    this.setState({ isOpen: true });
-  },
-  // leanpub-end-insert
-  render: function () {
-    // leanpub-start-insert
-    if (this.state.isOpen) {
-      // leanpub-end-insert
+class ToggleableTimerForm extends React.Component {
+  render() {
+    if (this.props.isOpen) {
       return (
         <TimerForm />
       );
     } else {
       return (
         <div className='ui basic content center aligned segment'>
-          {/* leanpub-start-insert */}
-          <button
-            className='ui basic button icon'
-            onClick={this.handleFormOpen}
-          >
-          {/* leanpub-end-insert */}
+          <button className='ui basic button icon'>
             <i className='plus icon'></i>
           </button>
         </div>
       );
     }
-  },
-});
+  }
+};
 
-const EditableTimerList = React.createClass({
-  render: function () {
-    // leanpub-start-insert
-    const timers = this.props.timers.map((timer) => (
-        <EditableTimer
-          key={timer.id}
-          id={timer.id}
-          title={timer.title}
-          project={timer.project}
-          elapsed={timer.elapsed}
-          runningSince={timer.runningSince}
-        />
-    ));
+class EditableTimerList extends React.Component {
+  render() {
     return (
       <div id='timers'>
-        {timers}
+        <EditableTimer
+          title='Learn React'
+          project='Web Domination'
+          elapsed='8986300'
+          runningSince={null}
+          editFormOpen={false}
+        />
+        <EditableTimer
+          title='Learn extreme ironing'
+          project='World Domination'
+          elapsed='3890985'
+          runningSince={null}
+          editFormOpen={true}
+        />
       </div>
     );
-    // leanpub-end-insert
-  },
-});
+  }
+};
 
-const EditableTimer = React.createClass({
-  // leanpub-start-insert
-  getInitialState: function () {
-    return {
-      editFormOpen: false,
-    };
-  },
-  // leanpub-end-insert
-  render: function () {
-    // leanpub-start-insert
-    if (this.state.editFormOpen) {
-      // leanpub-end-insert
+class EditableTimer extends React.Component {
+  render() {
+    if (this.props.editFormOpen) {
       return (
         <TimerForm
-          // leanpub-start-insert
-          id={this.props.id}
-          // leanpub-end-insert
           title={this.props.title}
           project={this.props.project}
         />
@@ -120,9 +68,6 @@ const EditableTimer = React.createClass({
     } else {
       return (
         <Timer
-          // leanpub-start-insert
-          id={this.props.id}
-          // leanpub-end-insert
           title={this.props.title}
           project={this.props.project}
           elapsed={this.props.elapsed}
@@ -130,11 +75,11 @@ const EditableTimer = React.createClass({
         />
       );
     }
-  },
-});
+  }
+};
 
-const Timer = React.createClass({
-  render: function () {
+class Timer extends React.Component {
+  render() {
     const elapsedString = helpers.renderElapsedString(this.props.elapsed);
     return (
       <div className='ui centered card'>
@@ -164,11 +109,11 @@ const Timer = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+};
 
-const TimerForm = React.createClass({
-  render: function () {
+class TimerForm extends React.Component {
+  render() {
     const submitText = this.props.title ? 'Update' : 'Create';
     return (
       <div className='ui centered card'>
@@ -194,8 +139,8 @@ const TimerForm = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+};
 
 ReactDOM.render(
   <TimersDashboard />,
